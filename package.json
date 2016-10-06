@@ -1,0 +1,15 @@
+{
+  "name": "anonchat",
+  "description": "anonymous end-to-end encrypted chat",
+  "version": "0.0.1",
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^3.0.2",
+    "create-ecdh": "^4.0.0"
+  },
+  "scripts": {
+    "pretest": "tscbuild",
+    "test": "mocha build/test/**/*.js"
+  },
+  "main": "anonchat.js"
+}
