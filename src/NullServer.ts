@@ -1,5 +1,6 @@
 import {ClientMessage} from './Client';
 import {ServerTransport} from './Transport';
+import {Debug} from './Debug';
 
 export interface Server {
     receive(room: string, client: string, message: ClientMessage): void;
@@ -33,6 +34,7 @@ export class NullServer implements Server {
     }
 
     private createServerRoom(roomName: string, client: string): ServerRoom {
+        Debug.log('Room created ', roomName, client);
         const serverRoom = new ServerRoom(roomName, client);
         this.rooms[roomName] = serverRoom;
         

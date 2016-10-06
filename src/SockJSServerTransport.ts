@@ -35,9 +35,10 @@ export class SockJSServerTransport implements ServerTransport {
     start() {
         const server = new NullServer(this);
         this.sockjsServer.on('connection', (conn) => {
-            
+            Debug.log('New connection', conn);
             conn.on('data', (data: string) => {
                 try {
+                    Debug.log('Data from ', conn.id, data);
                     const m :SockJSMessage = JSON.parse(data);
                     
                     const roomName = m['roomName'];
