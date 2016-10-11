@@ -1,6 +1,8 @@
 {
   "name": "anonchat",
   "description": "anonymous end-to-end encrypted chat",
+  "repository": "https://github.com/agazso/secretum",
+  "license": "GPL-2.0",
   "version": "0.0.1",
   "devDependencies": {
     "chai": "^3.5.0",
@@ -11,5 +13,13 @@
     "pretest": "tscbuild",
     "test": "mocha build/test/**/*.js"
   },
-  "main": "anonchat.js"
+  "main": "anonchat.js",
+  "dependencies": {
+    "@types/chai": "^3.4.34",
+    "@types/mocha": "^2.2.32",
+    "@types/node": "^6.0.45",
+    "@types/sinon": "^1.16.31",
+    "@types/sockjs-client": "^1.0.30",
+    "@types/sockjs-node": "^0.3.28"
+  }
 }
