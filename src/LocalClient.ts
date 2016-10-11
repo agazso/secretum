@@ -49,6 +49,7 @@ export class LocalClient implements Client {
     private readonly privateKey: string;
     private remoteClients: { [publickKey: string]: RemoteClient; } = {};
     private initialKey: string;
+    private id: number = 0;
    
     constructor(readonly name: string, readonly transport: ClientTransport, private keyGenerator:ClientKeyGenerator, private onMessage: MessageCallback) {
         [this.privateKey, this.publicKey] = keyGenerator.getIdentityKeyPair();
@@ -90,8 +91,7 @@ export class LocalClient implements Client {
                 break;
             case 'InitialKey':
                 const initialKey = Crypto.decrypt(
-                    Crypto.hash(this.keyGenerator.computeIdentitySecret(senderClientId)),
-                    message['initialKey']);
+                    Crypto.hash(this.keyGenerator.computeIdentitySecret(senderClientId)), message['initialKey']);
                 this.setInitialKey(initialKey);
                 break;
             
@@ -123,10 +123,13 @@ export class LocalClient implements Client {
     }
 
     sendEncryptedMessage(message: string) {
+        this.id += 1;
+
         const payload = this.encrypt(JSON.stringify({
                 kind: 'TextMessage',
                 noise: Random.getRandomStringWithBitLength(Random.getRandomInt(200) + 100),
-                message: message
+                message: message,
+                id: this.id
             }));
 
         this.sendServer({

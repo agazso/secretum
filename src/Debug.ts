@@ -1,5 +1,6 @@
 export class Debug {
     static isDebug: boolean = false;
+    static prefix: string = '';
     
     static setDebug(isDebug: boolean) {
         this.isDebug = isDebug;
@@ -7,6 +8,7 @@ export class Debug {
 
     static log(...args: any[]) {
         if (this.isDebug) {
+            args.unshift(Debug.prefix);
             args.unshift(Debug.getCallerNameOf(3) + ':');
             console.log.apply(console, args);
         }

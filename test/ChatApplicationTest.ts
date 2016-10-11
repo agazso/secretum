@@ -10,7 +10,8 @@ describe('ChatApplication', () => {
             roomSecret: 'roomSecret',
             serverHostname: 'localhost',
             serverPort: 18000,
-            serverPrefix: '/chat'            
+            serverPrefix: '/chat',
+            onMessage: (msg: string) => {}          
         }
         const app = new ChatApplication(options);
     });

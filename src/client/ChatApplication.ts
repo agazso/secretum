@@ -10,11 +10,12 @@ interface ChatApplicationOptions {
     serverHostname: string;
     serverPort: number;
     serverPrefix: string;
+    onMessage: (message: string) => void;
 }
 
 export class ChatApplication {
     private readonly localClient: LocalClient;
-    private readonly clientTransport: ClientTransport;
+    private readonly clientTransport: SockJSClientTransport;
 
     constructor(options: ChatApplicationOptions) {
         const keyGenerator = new DefaultClientKeyGenerator(options.clientName, options.roomSecret, this.getInitialKey());
@@ -22,7 +23,8 @@ export class ChatApplication {
         this.clientTransport = new SockJSClientTransport(serverUrl, options.roomName, () => {
             this.localClient.sendPublishPublicKey();
         });
-        this.localClient = new LocalClient(options.clientName, this.clientTransport, keyGenerator, this.onMessage);
+        this.localClient = new LocalClient(options.clientName, this.clientTransport, keyGenerator, options.onMessage);
+        this.clientTransport.onReceive = (clientId, message) => { this.localClient.receive(clientId, message)};
     }
 
     onMessage(message: string) {

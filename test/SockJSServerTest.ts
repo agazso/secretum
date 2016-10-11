@@ -36,6 +36,7 @@ describe('SockJSServer', () => {
     });
 
     it('two clients should connect and send encrypted message', (done) => {
+        Debug.setDebug(true);
         const message = 'hello';
         serverTransport.start();
         const client1Transport = new SockJSClientTransport(serverUrl, roomName, () => {
@@ -44,14 +45,14 @@ describe('SockJSServer', () => {
                 expect(msg).to.be.equal(message);
                 done();
             });
-            client1Transport.onMessage = (senderClientId, clientMessage) => {
+            client1Transport.onReceive = (senderClientId, clientMessage) => {
                 client1.receive(senderClientId, clientMessage);
             };
 
             const client2Transport = new SockJSClientTransport(serverUrl, roomName, () => {
                 const keyGenerator2 = new DefaultClientKeyGenerator(localClientName + '2', 'secret', initialKey);
                 const client2 = new LocalClient(localClientName + '2', client2Transport, keyGenerator2, (message) => {});
-                client2Transport.onMessage = (senderClientId, clientMessage) => {
+                client2Transport.onReceive = (senderClientId, clientMessage) => {
                     client2.receive(senderClientId, clientMessage);
 
                     if (clientMessage.kind == 'InitialKey') {

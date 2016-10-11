@@ -14,23 +14,25 @@ import stream = require("stream");
 
 export class SockJSClientTransport implements ClientTransport {
     sock: SockJSClass;
-    onMessage: (data: string, message: ClientMessage) => void;
-    
-    constructor(private readonly url: string, private readonly roomName: string, onconnect: () => void) {
+    onReceive: (clientId: string, message: ClientMessage) => void;
+
+    constructor(private readonly url: string,
+                private readonly roomName: string, 
+                onConnect: () => void,
+                ) {
+        
         this.sock = new SockJS(this.url);
         this.sock.onopen = (e: __SockJSClient.OpenEvent) => {
-            onconnect();
+            onConnect();
         };
         
         this.sock.onmessage = (e) => {
-            if (this.onMessage) {
-                try {
-                    Debug.log(e);
-                    const sockMessage = <SockJSMessage> JSON.parse(e.data);
-                    this.onMessage(sockMessage.clientId, sockMessage.message);
-                } catch (e) {
-                    console.log(e);
-                }
+            try {
+                Debug.log(e);
+                const sockMessage = <SockJSMessage> JSON.parse(e.data);
+                this.onReceive(sockMessage.clientId, sockMessage.message);
+            } catch (e) {
+                console.log(e);
             }
         };
     }

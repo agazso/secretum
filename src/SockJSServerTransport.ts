@@ -35,7 +35,7 @@ export class SockJSServerTransport implements ServerTransport {
     start() {
         const server = new NullServer(this);
         this.sockjsServer.on('connection', (conn) => {
-            Debug.log('New connection', conn);
+            Debug.log('New connection');
             conn.on('data', (data: string) => {
                 try {
                     Debug.log('Data from ', conn.id, data);
@@ -46,6 +46,7 @@ export class SockJSServerTransport implements ServerTransport {
                     const message = m['message'];
                     
                     if (!this.connections.hasOwnProperty(clientId)) {
+                        // TODO check if clientId is already existing
                         this.connections[clientId] = {
                             connection: conn,
                             client: clientId
@@ -79,6 +80,7 @@ export class SockJSServerTransport implements ServerTransport {
                 roomName: roomName,
                 message: message
             }
+            Debug.log(clientId);
             clientConnection.connection.write(JSON.stringify(sockMessage));
         }
     }

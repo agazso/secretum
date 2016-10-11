@@ -16,24 +16,34 @@ function setInputElementValueOrError(elementName: string, value: string) {
     e.value = value;
 }
 
+function addToHistory(message: string, byMe: boolean) {
+    const history = document.getElementById('history');
+    if (history) {
+        const divClass = byMe ? 'message mine' : 'message';
+        history.innerHTML += '<li class="' + divClass + '"><p>' + message + '</p></li>'; 
+    }
+}
+
 setInputElementValueOrError('name', Random.getRandomString());
+
 
 let app: ChatApplication | undefined;
 const loginButton = document.getElementById('login');
 if (loginButton) {
     loginButton.onclick = () => {
+        Debug.prefix = getInputElementValueOrError('name');
+
         app = new ChatApplication({
             clientName: getInputElementValueOrError('name'),
             roomName: getInputElementValueOrError('room'),
             roomSecret: getInputElementValueOrError('secret'),
             serverHostname: 'localhost',
             serverPort: 8000,
-            serverPrefix: '/chat'
+            serverPrefix: '/chat',
+            onMessage: (msg) => {
+                addToHistory(msg, false);
+            }
         });
-
-        // app.onMessage = () => {
-
-        // };
 
         const loginform = document.getElementById('loginform');
         if (loginform) {
@@ -50,10 +60,8 @@ if (loginButton) {
                     if (app) {
                         app.sendMessage(message);
                     }
-                    const chatinput = document.getElementById('chatinput');
-                    if (chatinput) {
-                        chatinput.innerHTML = '';
-                    }
+                    addToHistory(message, true);
+                    setInputElementValueOrError('chatinput', '');
                 };
             }
         }

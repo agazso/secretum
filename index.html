@@ -3,6 +3,43 @@
     <head>
         <meta charset="UTF-8" />
         <title>Hello!</title>
+        <style>
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: sans-serif;
+}
+
+.message {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  padding: 5px;
+  background-color: #ddd;
+  border-radius: 4px;
+  max-width: 40%;
+  margin: 4px;
+}
+
+.message.mine {
+  flex-direction: row-reverse;  
+  background-color: #08f;
+  color: #fff;
+}
+
+ul.history {
+  list-style: none;
+
+}
+
+.history {
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+        </style>
     </head>
     <body>
         <div id="example"></div>
@@ -14,7 +51,7 @@
         </div>
 
         <div id="chat" style="display:none">
-            <div id="history"></div>
+            <ul id="history"></ul>
             <input type="text" id="chatinput" value="">
             <button id="send">Send</button>
         </div>

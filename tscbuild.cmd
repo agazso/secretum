@@ -5,6 +5,5 @@ set ldt=%ldt:~0,4%-%ldt:~4,2%-%ldt:~6,2% %ldt:~8,2%:%ldt:~10,2%:%ldt:~12,6%
 echo ------------ [%ldt%]
 
 tsc %*
-echo %ERRORLEVEL%
-if %ERRORLEVEL% GTR 0 exit /B %ERRORLEVEL%
+echo "browserify"
 browserify -o bin/app.js build/src/client/BrowserChatApplication.js

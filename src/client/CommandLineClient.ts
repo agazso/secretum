@@ -2,7 +2,7 @@ import {ChatApplication} from './ChatApplication';
 
 class CommandLineClient {
     constructor() {
-        if (process.argv.length < 6) {
+        if (process.argv.length < 7) {
             const usage = "Usage: ";
             console.log(usage);
             throw new Error('');
@@ -14,7 +14,10 @@ class CommandLineClient {
             roomSecret: process.argv[3],
             serverHostname: process.argv[4],
             serverPort: parseInt(process.argv[5], 10),
-            serverPrefix: process.argv[6]
+            serverPrefix: process.argv[6],
+            onMessage: (msg:string) => {
+                console.log(msg);
+            }
         }
 
         const app = new ChatApplication(options);

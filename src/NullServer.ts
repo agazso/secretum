@@ -43,6 +43,7 @@ export class NullServer implements Server {
 
     receive(roomName: string, senderClient: string, message: ClientMessage): void {
         let serverRoom = this.rooms[roomName];
+        Debug.log(roomName, serverRoom);
         
         if (serverRoom == null) {
             if (message.kind != 'PublishPublicKey') {
