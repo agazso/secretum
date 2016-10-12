@@ -36,7 +36,6 @@ describe('SockJSServer', () => {
     });
 
     it('two clients should connect and send encrypted message', (done) => {
-        Debug.setDebug(true);
         const message = 'hello';
         serverTransport.start();
         const client1Transport = new SockJSClientTransport(serverUrl, roomName, () => {

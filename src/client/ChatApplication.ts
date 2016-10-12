@@ -27,6 +27,10 @@ export class ChatApplication {
         this.clientTransport.onReceive = (clientId, message) => { this.localClient.receive(clientId, message)};
     }
 
+    getRemoteClientNames(): string[] {
+        return this.localClient.getRemoteClientNames();
+    }
+
     onMessage(message: string) {
         console.log('onMessage: ', message);
     }

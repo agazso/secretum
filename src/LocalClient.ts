@@ -118,6 +118,12 @@ export class LocalClient implements Client {
         this.remoteClients[publicKey] = new RemoteClient(name, publicKey);
     }
 
+    getRemoteClientNames(): string[] {
+        return Object.keys(this.remoteClients).map((remoteClient, index) => {
+            return this.remoteClients[remoteClient].name;
+        })        
+    }
+
     sendServer(message: ClientMessage) {
         this.transport.sendServer(this.publicKey, message); 
     }

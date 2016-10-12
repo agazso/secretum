@@ -10,33 +10,128 @@
   padding: 0;
   box-sizing: border-box;
   font-family: sans-serif;
+  font-size: 100%;
+  overflow: hidden;
 }
 
-.message {
+html, body {
+  width: 100%;
+  height: 100%;
+}
+
+p.message {
   display: flex;
   flex-direction: row;
   align-items: flex-end;
   padding: 5px;
   background-color: #ddd;
-  border-radius: 4px;
-  max-width: 40%;
+  border-radius: 6px;
+  max-width: 70%;
   margin: 4px;
 }
 
-.message.mine {
-  flex-direction: row-reverse;  
+p.message.your {
+  border-bottom-left-radius: 0px;
+}
+
+p.message.mine {
   background-color: #08f;
   color: #fff;
+  border-bottom-right-radius: 0px;
+}
+
+.entry {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  max-width: 100%;
+}
+
+.entry.mine {
+  flex-direction: row-reverse;  
 }
 
 ul.history {
   list-style: none;
-
+  max-width: 100%;
+  width: 100%;
+  transition: all 0.444s cubic-bezier(0.7, 0, 0.3, 1);
+  position: absolute; 
+  overflow-y: auto;
+  overflow-x: hidden;
+  top: 55px;
+  bottom: 40px;
 }
 
 .history {
-  max-width: 100%;
   margin: 0 auto;
+}
+
+.write input {
+    font-size: 16px;
+    float: left;
+    width: 90%;
+    height: 40px;
+    padding: 0 10px;
+    color: #1a1a1a;
+    border: 0;
+    outline: none;
+    background-color: #eceff1;
+    font-family: 'Source Sans Pro', sans-serif;
+    font-weight: 400;
+}
+
+input.nostyle {
+    border: 0;
+    width: 90%;
+    padding: 12px 0 12px 0;
+    background: transparent;
+}
+
+.write {
+  position: absolute;
+  bottom: 0px;
+  width: 100%;
+  background-color: #eceff1;
+}
+
+#head {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    display: flex;
+    height: 55px;
+    padding: 17px 0 0 25px;
+    z-index: 90;
+    transition: all 0.333s ease-in-out;
+    font-size: 100%;
+}
+
+.style-bg {
+    background: #08f;
+    color: white;
+    position:absolute; 
+    top: 0px; 
+    left: 0px; 
+    height:50px; 
+    overflow:hidden;
+}
+
+.sendcontainer {
+  float: right;
+  width: 40px;
+  height: 40px;
+  background-color: #eceff1;
+}
+
+.send {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+  margin-top: 10px;
+  background-color: #eceff1;
+  cursor: pointer;
 }
 
         </style>
@@ -47,13 +142,28 @@ ul.history {
             Name: <input type="text" id="name" value="Name"><br>
             Room: <input type="text" id="room" value="Room"><br>
             Secret: <input type="text" id="secret" value="Secret"><br>
+            Server: <input type="text" id="server" value=""><br>
+            Port: <input type="text" id="port" value=""><br>
             <button id="login">Login</button>
         </div>
 
-        <div id="chat" style="display:none">
-            <ul id="history"></ul>
-            <input type="text" id="chatinput" value="">
-            <button id="send">Send</button>
+        <div id="chat" style="display:none; position: relative; overflow: hidden; height: 100%; width: 100%;">
+            <div id="head" class="style-bg">
+              <i class="mdi mdi-arrow-left" style="display: block;"></i>
+              <i class="mdi mdi-fullscreen-exit"></i>
+              <i class="mdi mdi-menu" style="display: none;"></i> 
+              <h1 id="chatname"></h1>
+              <i class="mdi mdi-chevron-down"></i>
+            </div>
+
+            <ul class="history" id="history"></ul>
+
+            <div class="write">
+                <input type="text" id="chatinput" value="" />
+                <div class="sendcontainer">
+                  <img id="send" class="send" src="assets/images/send.svg" />
+                </div>
+            </div>
         </div>
 
         <script src="./bin/app.js"></script>

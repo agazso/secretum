@@ -16,16 +16,62 @@ function setInputElementValueOrError(elementName: string, value: string) {
     e.value = value;
 }
 
-function addToHistory(message: string, byMe: boolean) {
+function getHostnameAndPort(): [string, number] {
+    if (window.location.href.indexOf('file') == 0) {
+        return ['localhost', 8000];
+    }
+
+    console.log('getHostnameAndPort --', window.location.port);
+    let port = 80;
+    if (window.location.port) {
+        port = Number(window.location.port);
+    }
+    return [window.location.hostname, port];    
+}
+
+function addToHistory(message: string, mine: boolean) {
     const history = document.getElementById('history');
     if (history) {
-        const divClass = byMe ? 'message mine' : 'message';
-        history.innerHTML += '<li class="' + divClass + '"><p>' + message + '</p></li>'; 
+        let liClass = 'entry';
+        let pClass = 'message';
+        if (mine) {
+            liClass += ' mine';
+            pClass += ' mine';
+        } else {
+            liClass += ' your';
+            pClass += ' your';
+        }
+        history.innerHTML += `<li class="${liClass}"><p class="${pClass}">` + message + '</p></li>';
+        history.scrollTop = history.scrollHeight; 
     }
 }
 
-setInputElementValueOrError('name', Random.getRandomString());
+function sendMessage(app: ChatApplication | undefined) {
+    if (!app) {
+        return;
+    }
+    
+    const message = getInputElementValueOrError('chatinput');
+    if (message == '') {
+        return;
+    }
+    
+    app.sendMessage(message);
+    addToHistory(message, true);
+    setInputElementValueOrError('chatinput', '');
+    
+    // HACK
+    const chatname = document.getElementById('chatname');
+    if (chatname) {
+        chatname.innerHTML = app.getRemoteClientNames().join();
+    }
+}
 
+const [serverHostname, serverPort] = getHostnameAndPort();
+
+setInputElementValueOrError('name', Random.getRandomString());
+setInputElementValueOrError('server', serverHostname);
+setInputElementValueOrError('port', serverPort.toString());
 
 let app: ChatApplication | undefined;
 const loginButton = document.getElementById('login');
@@ -33,12 +79,13 @@ if (loginButton) {
     loginButton.onclick = () => {
         Debug.prefix = getInputElementValueOrError('name');
 
+
         app = new ChatApplication({
             clientName: getInputElementValueOrError('name'),
             roomName: getInputElementValueOrError('room'),
             roomSecret: getInputElementValueOrError('secret'),
-            serverHostname: 'localhost',
-            serverPort: 8000,
+            serverHostname: serverHostname,
+            serverPort: serverPort,
             serverPrefix: '/chat',
             onMessage: (msg) => {
                 addToHistory(msg, false);
@@ -53,15 +100,19 @@ if (loginButton) {
         const chat = document.getElementById('chat');
         if (chat) {
             chat.style.display = 'block';
+   
+            const chatinput = <HTMLInputElement> document.getElementById('chatinput');
+            chatinput.addEventListener("keyup", (event) => {
+                event.preventDefault();
+                if (event.keyCode == 13) {
+                    sendMessage(app);
+                }
+            });
+
             const sendButton = document.getElementById('send');
             if (sendButton) {
                 sendButton.onclick = () => {
-                    const message = getInputElementValueOrError('chatinput');
-                    if (app) {
-                        app.sendMessage(message);
-                    }
-                    addToHistory(message, true);
-                    setInputElementValueOrError('chatinput', '');
+                    sendMessage(app);
                 };
             }
         }
