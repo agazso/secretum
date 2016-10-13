@@ -73,6 +73,29 @@ setInputElementValueOrError('name', Random.getRandomString());
 setInputElementValueOrError('server', serverHostname);
 setInputElementValueOrError('port', serverPort.toString());
 
+document.addEventListener('gesturestart', function (e) {
+    e.preventDefault();
+});
+
+if (window.location.search.indexOf('debug') != -1) {
+    const server = document.getElementById('server');
+    if (server) {
+        server.style.display = 'block';
+    }
+    const port = document.getElementById('port');
+    if (port) {
+        port.style.display = 'block';
+    }
+}
+
+const backButton = document.getElementById('back');
+if (backButton) {
+    backButton.onclick = () => {
+        window.location.reload();
+    };
+}
+
+
 let app: ChatApplication | undefined;
 const loginButton = document.getElementById('login');
 if (loginButton) {
