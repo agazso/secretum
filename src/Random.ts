@@ -16,6 +16,10 @@ export class Random {
     static getRandomStringWithBitLength(bitLength: number): string {
         return crypto.randomBytes(Math.floor(bitLength / 8)).toString('base64');
     }
+
+    static getRandomHexStringWithBitLength(bitLength: number): string {
+        return crypto.randomBytes(Math.floor(bitLength / 8)).toString('hex');
+    }
     
     static getRandomInt(max: number): number {
         return Math.floor(Math.random() * max);
