@@ -4,6 +4,7 @@ import {Debug} from './Debug';
 
 export interface Server {
     receive(room: string, client: string, message: ClientMessage): void;
+    disconnectClient(client: string): void;
 }
 
 class ServerRoom {
@@ -29,6 +30,7 @@ class ServerRoom {
 
 export class NullServer implements Server {
     private rooms: { [name: string]: ServerRoom; } = {};
+    private clientRooms: { [client: string]: string[]; } = {};
 
     constructor(private transport: ServerTransport) {
     }
@@ -63,6 +65,10 @@ export class NullServer implements Server {
                 this.transport.sendClient(client, roomName, senderClient, message);
             }
         }
+    }
+
+    disconnectClient(client: string) {
+        // TODO
     }
 
     getRoomCount(): number {

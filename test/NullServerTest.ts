@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import * as sinon from 'sinon';
 import {NullServer} from '../src/NullServer';
 import {Server} from '../src/NullServer';
-import {LocalClient, DefaultClientKeyGenerator} from '../src/LocalClient';
+import {LocalClient, DefaultClientKeyGenerator, NullClientEventHandler} from '../src/LocalClient';
 import {LocalClientTransport, LocalServerTransport} from '../src/Transport';
 import {Debug} from '../src/Debug';
 
@@ -11,6 +11,7 @@ describe('NullServer', () => {
     const roomName = 'roomName';
     const initialKey = 'initialKey';
     const keyGenerator = new DefaultClientKeyGenerator(localClientName, localClientName + 'secret', initialKey);
+    const eventHandler = new NullClientEventHandler();
 
     function createLocalClient(server: NullServer, name: string): LocalClient {
         return createLocalClientWithSecret(server, name, 'secret');
@@ -19,7 +20,7 @@ describe('NullServer', () => {
     function createLocalClientWithSecret(server: NullServer, name: string, secret: string): LocalClient {
         const clientTransport = new LocalClientTransport(server, roomName);
         const keyGenerator = new DefaultClientKeyGenerator(name, secret, initialKey);
-        return new LocalClient(name, clientTransport, keyGenerator, (message) => {})
+        return new LocalClient(name, clientTransport, keyGenerator, eventHandler);
     }
 
     it('should create a room when receives CreateRoom command', () => {
@@ -27,7 +28,7 @@ describe('NullServer', () => {
         const server = serverTransport.server;
         const createServerRoomSpy = sinon.spy(server, 'createServerRoom');
         const clientTransport = new LocalClientTransport(server, roomName);
-        const client = new LocalClient(localClientName, clientTransport, keyGenerator, (message) => {});
+        const client = new LocalClient(localClientName, clientTransport, keyGenerator, eventHandler);
 
         expect(server.getRoomCount()).equals(0);
 
@@ -42,7 +43,7 @@ describe('NullServer', () => {
         const serverTransport = new LocalServerTransport();
         const server = serverTransport.server;
         const clientTransport = new LocalClientTransport(server, roomName);
-        const client = new LocalClient(localClientName, clientTransport, keyGenerator, (message) => {});
+        const client = new LocalClient(localClientName, clientTransport, keyGenerator, eventHandler);
 
         expect(server.getRoomCount()).equals(0);
         client.sendPublishPublicKey();
@@ -75,7 +76,7 @@ describe('NullServer', () => {
         serverTransport.registerClient(client1);
         const client2 = createLocalClient(server, localClientName + '2');
         serverTransport.registerClient(client2);
-        const clientOnMessageSpy2 = sinon.spy(client2, 'onMessage'); 
+        const clientOnMessageSpy2 = sinon.spy(client2, 'onTextMessage'); 
 
         client1.sendPublishPublicKey();
         client2.sendPublishPublicKey();
@@ -84,7 +85,7 @@ describe('NullServer', () => {
         client1.sendEncryptedMessage(message);
 
         expect(clientOnMessageSpy2.callCount).equals(1);
-        expect(clientOnMessageSpy2.calledWithExactly(message)).to.be.true;
+        expect(clientOnMessageSpy2.calledWithExactly(client1.publicKey, message)).to.be.true;
     });
 
     it('should exchange keys and send encrypted message', () => {
@@ -95,7 +96,7 @@ describe('NullServer', () => {
         const clientSendInitialKey1 = sinon.spy(client1, 'sendInitialKey'); 
         const client2 = createLocalClient(server, localClientName + '2');
         serverTransport.registerClient(client2);
-        const clientOnMessageSpy2 = sinon.spy(client2, 'onMessage'); 
+        const clientOnMessageSpy2 = sinon.spy(client2, 'onTextMessage'); 
 
         client1.sendPublishPublicKey();
         client2.sendPublishPublicKey();
@@ -106,7 +107,7 @@ describe('NullServer', () => {
         expect(clientSendInitialKey1.callCount).equals(1);
         expect(clientSendInitialKey1.calledWithExactly(client2.publicKey)).to.be.true;
         expect(clientOnMessageSpy2.callCount).equals(1);
-        expect(clientOnMessageSpy2.calledWithExactly(message)).to.be.true;
+        expect(clientOnMessageSpy2.calledWithExactly(client1.publicKey, message)).to.be.true;
     });
 
     it('should not work with different keys', () => {
@@ -117,7 +118,7 @@ describe('NullServer', () => {
         const clientSendInitialKey1 = sinon.spy(client1, 'sendInitialKey'); 
         const client2 = createLocalClientWithSecret(server, localClientName + '2', 'secret2');
         serverTransport.registerClient(client2);
-        const clientOnMessageSpy2 = sinon.spy(client2, 'onMessage'); 
+        const clientOnMessageSpy2 = sinon.spy(client2, 'onTextMessage'); 
 
         client1.sendPublishPublicKey();
         client2.sendPublishPublicKey();
@@ -138,10 +139,10 @@ describe('NullServer', () => {
         const clientSendInitialKey1 = sinon.spy(client1, 'sendInitialKey'); 
         const client2 = createLocalClient(server, localClientName + '2');
         serverTransport.registerClient(client2);
-        const clientOnMessageSpy2 = sinon.spy(client2, 'onMessage'); 
+        const clientOnMessageSpy2 = sinon.spy(client2, 'onTextMessage'); 
         const client3 = createLocalClient(server, localClientName + '3');
         serverTransport.registerClient(client3);
-        const clientOnMessageSpy3 = sinon.spy(client3, 'onMessage'); 
+        const clientOnMessageSpy3 = sinon.spy(client3, 'onTextMessage'); 
 
         client1.sendPublishPublicKey();
         client2.sendPublishPublicKey();
@@ -153,8 +154,8 @@ describe('NullServer', () => {
         expect(clientSendInitialKey1.callCount).equals(2);
         expect(clientSendInitialKey1.calledWithExactly(client2.publicKey)).to.be.true;
         expect(clientOnMessageSpy2.callCount).equals(1);
-        expect(clientOnMessageSpy2.calledWithExactly(message)).to.be.true;
+        expect(clientOnMessageSpy2.calledWithExactly(client1.publicKey, message)).to.be.true;
         expect(clientOnMessageSpy3.callCount).equals(1);
-        expect(clientOnMessageSpy3.calledWithExactly(message)).to.be.true;
+        expect(clientOnMessageSpy3.calledWithExactly(client1.publicKey, message)).to.be.true;
     });
 });
