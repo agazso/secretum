@@ -166,7 +166,7 @@ document.addEventListener('gesturestart', function (e) {
     e.preventDefault();
 });
 
-dom('backbutton', (backButton) => {
+dom('back', (backButton) => {
     backButton.onclick = () => {
         dom('chat', (chat) => {
             chat.style.transition = '0.4s';
