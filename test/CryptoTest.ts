@@ -93,7 +93,49 @@ describe('Crypto', () => {
         const secret = 'secret'
         const cipher = crypto.createCipher('aes-256-cbc', secret);
         const crypted = cipher.update(message, 'base64', 'base64') + cipher.final('base64');
-        console.log(crypted);
+        expect(crypted).to.be.equal('96KsXCoIF6e6yrmRED57z8jqTjiVqnm0hO1YoUb6tRM=');
+    });
+
+    it('test speed of crypto', () => {
+        function cryptoEncryptTiming() {
+            const numIterations = 100000;
+            const message = 'hello world, welcome to the paradise';
+            const secret = 'secret';
+            const startTime = new Date().valueOf();
+            for (let i = 0; i < numIterations; i++) {
+                const result = Crypto.encrypt(secret, message + i.toString());
+            }
+            const endTime = new Date().valueOf();
+            console.log(`Number of iterations: ${numIterations}, elapsed time: ${endTime - startTime}`);
+        };
+
+        function cryptoHmacTiming() {
+            const numIterations = 100000;
+            const secret = 'secret';
+            const startTime = new Date().valueOf();
+            let message = 'hello world, welcome to the paradise';
+            for (let i = 0; i < numIterations; i++) {
+                message = Crypto.hmac(secret, message + i.toString());
+            }
+            const endTime = new Date().valueOf();
+            console.log(`Number of iterations: ${numIterations}, elapsed time: ${endTime - startTime}`);
+        };
+
+        function cryptoHashTiming() {
+            const numIterations = 100000;
+            const startTime = new Date().valueOf();
+            let message = 'hello world, welcome to the paradise';
+            for (let i = 0; i < numIterations; i++) {
+                message = Crypto.hash(message + i.toString());
+            }
+            const endTime = new Date().valueOf();
+            console.log(`Number of iterations: ${numIterations}, elapsed time: ${endTime - startTime}`);
+        };
+
+
+        //cryptoEncryptTiming();
+        // cryptoHmacTiming();
+        // cryptoHashTiming();
     });
 });
 
