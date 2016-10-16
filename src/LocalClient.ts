@@ -6,8 +6,16 @@ import {Crypto, EcdhKeyPair} from './Crypto';
 import {Debug} from './Debug';
 import {Random} from './Random';
 
-interface MessageCallback {
-    (onMessage: string): void;
+export interface ClientEventHandler {
+    onMessage(clientId: string, message: string): void;
+    onClientConnected(clientId: string): void;
+    onClientDisconnected(clientId: string): void;
+}
+
+export class NullClientEventHandler implements ClientEventHandler {
+    onMessage(clientId: string , message: string) {}
+    onClientConnected(clientId: string) {}
+    onClientDisconnected(clientId: string) {}
 }
 
 export interface ClientKeyGenerator {
@@ -51,7 +59,7 @@ export class LocalClient implements Client {
     private initialKey: string;
     private id: number = 0;
    
-    constructor(readonly name: string, readonly transport: ClientTransport, private keyGenerator:ClientKeyGenerator, private onMessage: MessageCallback) {
+    constructor(readonly name: string, readonly transport: ClientTransport, private keyGenerator:ClientKeyGenerator, private eventHandler: ClientEventHandler) {
         [this.privateKey, this.publicKey] = keyGenerator.getIdentityKeyPair();
     }
 
@@ -82,29 +90,34 @@ export class LocalClient implements Client {
         switch (message.kind) {
             case 'PublishPublicKey':
                 if (!this.remoteClients.hasOwnProperty(message['publicKey'])) {
-                    this.addRemoteClient(message['name'], message['publicKey']);
                     this.sendInitialKey(message['publicKey']);
+                    this.addRemoteClient(message['name'], message['publicKey']);
+                    this.eventHandler.onClientConnected(message['name']);
                 }
                 break;
             case 'EncryptedMessage':
-                this.onEncryptedMessage(message.payload);
+                this.onEncryptedMessage(senderClientId, message.payload);
                 break;
             case 'InitialKey':
                 const initialKey = Crypto.decrypt(
                     Crypto.hash(this.keyGenerator.computeIdentitySecret(senderClientId)), message['initialKey']);
                 this.setInitialKey(initialKey);
+                if (!this.remoteClients.hasOwnProperty(message['publicKey'])) {
+                    this.addRemoteClient(message['name'], message['publicKey']);
+                    this.eventHandler.onClientConnected(message['name']);
+                }
                 break;
             
             default: return assertNever(message);
         }
     }
 
-    onEncryptedMessage(message: string) {
+    onEncryptedMessage(senderClientId: string, message: string) {
         const decryptedMessage = this.decrypt(message);
         const payload = <EncryptedMessagePayload> JSON.parse(decryptedMessage);
         switch (payload.kind) {
             case 'TextMessage':
-                this.onMessage(payload.message);
+                this.onTextMessage(senderClientId, payload.message);
                 break;
 
             case 'PublicKeyAuthentication':
@@ -112,6 +125,10 @@ export class LocalClient implements Client {
             
             default: return assertNever(payload);
         }
+    }
+
+    onTextMessage(senderClientId: string, message: string) {
+        this.eventHandler.onMessage(senderClientId, message);
     }
 
     addRemoteClient(name: string, publicKey: string) {
@@ -122,6 +139,10 @@ export class LocalClient implements Client {
         return Object.keys(this.remoteClients).map((remoteClient, index) => {
             return this.remoteClients[remoteClient].name;
         })        
+    }
+
+    getRemoteClientNameById(clientId: string): string {
+        return this.remoteClients[clientId].name;
     }
 
     sendServer(message: ClientMessage) {
