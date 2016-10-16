@@ -15,10 +15,18 @@ class CommandLineClient {
             serverHostname: process.argv[4],
             serverPort: parseInt(process.argv[5], 10),
             serverPrefix: process.argv[6],
-            onMessage: (msg:string) => {
-                console.log(msg);
+            eventHandler: {
+                onMessage: (msg:string) => {
+                    console.log(msg);
+                },
+                onClientConnected: (name:string) => {
+
+                },
+                onClientDisconnected: (name:string) => {
+
+                }
             }
-        }
+         }
 
         const app = new ChatApplication(options);
     }

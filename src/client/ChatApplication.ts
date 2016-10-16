@@ -1,4 +1,4 @@
-import {LocalClient, DefaultClientKeyGenerator} from '../LocalClient';
+import {LocalClient, DefaultClientKeyGenerator, ClientEventHandler} from '../LocalClient';
 import {ClientTransport, LocalClientTransport} from '../Transport';
 import {SockJSClientTransport} from '../SockJSClientTransport';
 import {Random} from '../Random';
@@ -10,7 +10,7 @@ interface ChatApplicationOptions {
     serverHostname: string;
     serverPort: number;
     serverPrefix: string;
-    onMessage: (message: string) => void;
+    eventHandler: ClientEventHandler;
 }
 
 export class ChatApplication {
@@ -23,7 +23,7 @@ export class ChatApplication {
         this.clientTransport = new SockJSClientTransport(serverUrl, options.roomName, () => {
             this.localClient.sendPublishPublicKey();
         });
-        this.localClient = new LocalClient(options.clientName, this.clientTransport, keyGenerator, options.onMessage);
+        this.localClient = new LocalClient(options.clientName, this.clientTransport, keyGenerator, options.eventHandler);
         this.clientTransport.onReceive = (clientId, message) => { this.localClient.receive(clientId, message)};
     }
 
@@ -31,9 +31,15 @@ export class ChatApplication {
         return this.localClient.getRemoteClientNames();
     }
 
+    getRemoteClientNameById(clientId: string): string {
+        return this.localClient.getRemoteClientNameById(clientId);
+    }
+
     onMessage(message: string) {
         console.log('onMessage: ', message);
     }
+
+
 
     sendMessage(message: string) {
         this.localClient.sendEncryptedMessage(message);

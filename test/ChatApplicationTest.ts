@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import * as sinon from 'sinon';
 import {ChatApplication} from '../src/client/ChatApplication';
+import {NullClientEventHandler} from '../src/LocalClient';
 
 describe('ChatApplication', () => {
     it('should be able to be created', () => {
@@ -11,7 +12,7 @@ describe('ChatApplication', () => {
             serverHostname: 'localhost',
             serverPort: 18000,
             serverPrefix: '/chat',
-            onMessage: (msg: string) => {}          
+            eventHandler: new NullClientEventHandler()
         }
         const app = new ChatApplication(options);
     });
