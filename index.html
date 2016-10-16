@@ -2,7 +2,9 @@
 <html>
     <head>
         <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <title>Hello!</title>
         <style>
 
@@ -25,25 +27,57 @@ html, body {
 (-webkit-min-device-pixel-ratio: 2), 
 (min-resolution: 192dpi) {
   * {
-    font-size: 100%;
-    line-height: 120%;
+    font-size: 99%;
     font-family: Helvetica, Roboto
   }
 
   input {
     -webkit-appearance: none;
   } 
+  
+  .apple-mobile-web-app-status-bar {
+    height: 3vmax;
+    width: 100%;
+    background: #006DF0;
+    color: white;
+    position:absolute;     
+  }
+
+}
+
+#loginform {
+  margin-top: 25%;
+  position: absolute;
+  transition: opacity 1s linear;*
+  opacity: 1;
+}
+
+/*
+#slide {
+    position: absolute;
+    left: -100vw;
+    width: 100vw;
+    height: 100vh;
+    transition: 1s;
+}
+*/
+
+#slide {
+    transition: 1s;
+    left: 100vw;
+    width: 100vw;
+    height: 100vh;
 }
 
 p.message {
   display: flex;
   flex-direction: row;
   align-items: flex-end;
-  padding: 2vw;
+  padding: 1vmax;
   background-color: #ddd;
-  border-radius: 2vw;
+  border-radius: 1vmax;
   max-width: 70%;
-  margin: 1vw;
+  margin: 0.2vmax;
 }
 
 p.message.your {
@@ -54,6 +88,16 @@ p.message.mine {
   background-color: #006DF0;
   color: #fff;
   border-bottom-right-radius: 0px;
+}
+
+p.status {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  padding: 0.3vmax;
+  max-width: 70%;
+  font-size: 90%;
+  color: lightgrey;  
 }
 
 .entry {
@@ -75,8 +119,9 @@ ul.history {
   position: absolute; 
   overflow-y: auto;
   overflow-x: hidden;
-  top: 12vw;
-  bottom: 12vw;
+  top: 6vmax;
+  bottom: 8vmax;
+  background-color: white;
 }
 
 .history {
@@ -90,42 +135,62 @@ ul.history {
     top: 0;
     width: 100%;
     display: flex;
-    height: 12vw;
     z-index: 90;
     transition: all 0.333s ease-in-out;
     font-size: 100%;
 }
 
 .style-bg {
+    height: 6vmax;
     background: #006DF0;
     color: white;
     position:absolute; 
     top: 0px; 
     left: 0px; 
-    height: 5%; 
     overflow:hidden;
 }
 
+@media 
+(-webkit-min-device-pixel-ratio: 2), 
+(min-resolution: 192dpi) {
+  .status-bar {
+    margin-top: 3vmax;
+  }
+}
+
+
 #chatname {
-    margin-top: 1vw;
-    padding: 2vw 1vw;  
-    height: 10vw;
+    margin-top: 1.5vmax;
+    margin-left: 40%;
+    height: 6vmax;
 }
 
 .back {
-  width: 6vw;
-  height: 6vw;
+  min-width: 3vmax;
+  min-height: 3vmax;
+  width: 3vmax;
+  height: 3vmax;
   cursor: pointer;
-  margin-top: 3vw;
+  margin-top: 1.5vmax;
+}
+
+.next {
+  min-width: 1.5vmax;
+  min-height: 1.5vmax;
+  width: 1.5vmax;
+  height: 1.5vmax;
+  cursor: pointer;
+  margin-left: 0.5vmax;
+  margin-top: 2vmax;
 }
 
 #loginform input {
     float: left;
     width: 80%;
-    height: 10vw;
+    height: 6vmax;
     margin-left: 10%;
-    margin-top: 1vw;
-    padding: 2vw 1vw;
+    margin-top: 1vmax;
+    padding: 2vmax 1vmax;
     color: #1a1a1a;
     border: 0;
     outline: none;
@@ -140,9 +205,9 @@ ul.history {
 .write input {
     float: left;
     width: 80%;
-    height: 10vw;
-    margin-top: 1vw;
-    padding: 2vw 1vw;
+    height: 6vmax;
+    margin-top: 1vmax;
+    padding: 2vmax 0.5vmax;
     color: #1a1a1a;
     border: 0;
     outline: none;
@@ -159,21 +224,21 @@ input.nostyle {
   position: absolute;
   bottom: 0px;
   width: 100%;
-  height: 12vw;
+  height: 8vmax;
   border-top: thin solid lightgrey;
 }
 
 .sendcontainer {
   position: relative;
   float: right;
-  width: 10vw;
+  width: 6vmax;
   height: 100%;
-  margin-top: 3vw;
+  margin-top: 2vmax;
 }
 
 .send {
-  width: 6vw;
-  height: 6vw;
+  width: 4vmax;
+  height: 4vmax;
   cursor: pointer;
   display:table-cell;
   vertical-align:middle; 
@@ -182,30 +247,32 @@ input.nostyle {
         </style>
     </head>
     <body>
-        <form id="loginform" action="#">
+        <div id="apple-mobile-status-bar" class="apple-mobile-web-app-status-bar"></div>
+        <form id="loginform">
             <input type="text" id="name" value="Name" placeholder="Name">
             <input type="text" id="room" value="Room" placeholder="Room">
             <input type="text" id="secret" value="Secret" placeholder="Secret">
             <input type="text" id="server" value="" placeholder="Server" style="display: none">
             <input type="text" id="port" value="" placeholder="Port" style="display: none">
-            <input type="submit" class="login" id="login" value="Login" />
+            <input type="button" class="login" id="login" value="Login" />
         </form>
 
         <div id="chat" style="display:none; position: relative; overflow: hidden; height: 100%; width: 100%;">
-            <div id="head" class="style-bg">
+            <div id="head" class="status-bar style-bg">
               <img id="back" class="back" src="assets/images/back.png" />
-              <h1 id="chatname"></h1>
+              <p id="chatname"></p>
+              <img id="next" class="next" src="assets/images/next.png" />
             </div>
 
             <ul class="history" id="history"></ul>
 
             <div class="write">
-                <form action="#" autocomplete="off">
-                  <input type="text" id="chatinput" autocomplete="off" value="" placeholder="Type a message..." />
+                <!--<form autocomplete="off">-->
+                  <input type="textarea" id="chatinput" autocomplete="off" value="" placeholder="Type a message..." />
                   <div class="sendcontainer">
-                    <img id="send" class="send" src="assets/images/send-message-button.png" />
+                    <img id="send" class="send" src="assets/images/send-message-button.png" alt="Send" title="Send"/>
                   </div>
-                </form>
+                <!--</form>-->
             </div>
         </div>
 
